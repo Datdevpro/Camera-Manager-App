@@ -15,7 +15,7 @@ def user():
         global d
         d=department
         lbd.config(text=f"{n} - {p} - {d}")
-
+        get_data()
         # Clear entry fields for new input
         name_entry.delete(0, 'end')
         position_entry.delete(0, 'end')
@@ -25,7 +25,9 @@ def user():
     def get_data():
         #print(f'{n},{p},{d}')
         #return [n, p, d]  # get data
-        print('%s, %s, %s' % (n, p, d))
+        return [n,p,d]
+    def delelte_data():
+        pass
 
 
     name_label = Label(root, text="Tên:",font=("Segoe UI", 10))
