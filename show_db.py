@@ -4,7 +4,6 @@ from tkinter import filedialog, messagebox, ttk
 import pandas as pd
 def showdb():
 
-
     # initalise the tkinter GUI
     root = tk.Tk()
 
@@ -75,7 +74,8 @@ def showdb():
         tv1["show"] = "headings"
         for column in tv1["columns"]:
             tv1.heading(column, text=column) # let the column heading = column name
-
+            max_length = max(df[column].astype(str).map(len).max(), len(column))
+            tv1.column(column, width=max_length * 10)
         df_rows = df.to_numpy().tolist() # turns the dataframe into a list of lists
         for row in df_rows:
             tv1.insert("", "end", values=row) # inserts each list into the treeview. For parameters see https://docs.python.org/3/library/tkinter.ttk.html#tkinter.ttk.Treeview.insert

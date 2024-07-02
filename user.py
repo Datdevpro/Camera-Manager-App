@@ -1,65 +1,90 @@
-from tkinter import Tk, Label, Entry, Button, StringVar, ttk
-import tkinter as tk
-def user():
+#### create and named folder as the name entry
+
+from tkinter import Tk, Label, Entry, Button, StringVar, ttk, messagebox
+import tkinter as tk 
+import os 
+import shutil
+ 
+def user_manage():
     root = tk.Tk()
-    root.geometry("1000x350")
-    root.title("User")
-    def add_data():
-        name = name_entry.get()
-        position = position_entry.get()
-        department = department_entry.get()  # Corrected line to get department value
-        global n
-        n=name
-        global p
-        p = position
-        global d
-        d=department
-        lbd.config(text=f"{n} - {p} - {d}")
-        get_data()
-        # Clear entry fields for new input
-        name_entry.delete(0, 'end')
-        position_entry.delete(0, 'end')
-        department_entry.delete(0, 'end')  # Clear department entry
-            
+    root.title("Thêm / Xóa nhân sự")
+    root.geometry("650x550")
+    font = ("Segoe UI", 11)
+
+    # direction = Label(root, text="Thư mục mặc định là: D://VScode//AI//tkin//user.py", font=font)
+    # direction.grid(row=0)
+    heading = Label(root, text="Thêm / Xóa nhân sự", font=("Segoe UI", 14))
+    heading.pack(pady=10)
+
+    main_frame = tk.Frame(root,width=600, height=400)
+    main_frame.pack(anchor='center')
+
+
+    name = Label(main_frame, text="Tên nhân sự:",font=font)
+    name.grid(row=1, column=0 ,padx=5, pady=30)
+    name_entry = Entry(main_frame, font=font, width=30)
+    name_entry.grid(row=1, column=1,padx=5,pady=30)
+
+    position = Label(main_frame, text="Đơn vị:",font=font)
+    position.grid(row=2, column=0 ,padx=5, pady=30)
+    position_entry = Entry(main_frame, font=font, width=30)
+    position_entry.grid(row=2, column=1,padx=5,pady=30)
+
+    global path   # khai báo một đường dẫn cố định
+    path = "D:/VScode/AI/tkin"
+    def add(): # tạo folder
+        name_folder = f"{name_entry.get()}_{position_entry.get()}"
         
-    def get_data():
-        #print(f'{n},{p},{d}')
-        #return [n, p, d]  # get data
-        return [n,p,d]
-    def delelte_data():
-        pass
+        fullpath = os.path.join(path, name_folder)
+        try:
+            os.makedirs(fullpath)
+            messagebox.showinfo("Thông báo" ,f"Tạo thư mục thành công !\nđường dẫn: {fullpath}")
+        except FileExistsError:
+            messagebox.showinfo('Thông báo' ,"Thư mục đã tồn tại !")
+        except Exception as e:
+            messagebox.showinfo("Thông báo", "Lỗi 404 !")
+
+    def delete(): # xóa folder
+        name_folder = f"{name_entry.get()}_{position_entry.get()}"
+        fullpath = os.path.join(path, name_folder)
+        try:
+            if os.path.exists(fullpath):
+                shutil.rmtree(fullpath)
+                messagebox.showinfo("Thành công", f"Thư mục '{fullpath}' đã được xóa thành công.")
+            else:
+                messagebox.showerror("Lỗi", f"Thư mục '{fullpath}' không tồn tại.")
+        except Exception as e:
+            messagebox.showerror("Lỗi", f"Đã xảy ra lỗi khi xóa thư mục: {e}")
+        
 
 
-    name_label = Label(root, text="Tên:",font=("Segoe UI", 10))
-    name_label.grid(row=0, column=0 ,padx=15, pady=20)        
-    position_label = Label(root, text="Chức Vụ:", font=("Segoe UI", 10))
-    position_label.grid(row=1, column=0, padx=15, pady=10)
-    department_label = Label(root, text="Vị Trí:", font=("Segoe UI", 10))
-    department_label.grid(row=2, column=0,padx=15, pady=20)
+    btn_them = Button(main_frame,
+                        text="Thêm", 
+                        padx=10, 
+                        overrelief="raised", 
+                        cursor="hand2", 
+                        bd = 3,
+                        command=add)
+    btn_them.grid(row=3, column=0, pady=40, padx=30)
 
-    # create entry 
-    name_entry = Entry(root, font=("Segoe UI", 10), width=30)
-    name_entry.grid(row=0, column=1,padx=5, pady=10)
+    btn_xoa = Button(main_frame,
+                        text="Xóa", 
+                        padx=10, 
+                        overrelief="raised", 
+                        cursor="hand2", 
+                        bd = 3,
+                        command=delete)
+    btn_xoa.grid(row=3, column=1, pady=40, padx=30)
 
-    position_entry = Entry(root,font=("Segoe UI", 10), width=30)
-    position_entry.grid(row=1, column=1,padx=5, pady=10)
-
-    department_entry = Entry(root, font=("Segoe UI", 10), width=30)
-    department_entry.grid(row=2, column=1,padx=5, pady=10)
-
-    add_button = Button(root, text="ADD", command=add_data)
-    add_button.grid(row=3, column=0, pady=10, padx=30)
-
-    delete_button = Button(root, text="DELETE", command=get_data)
-    delete_button.grid(row=3, column=1, pady=10, padx=10)
-    # Create a ttk.Treeview widget for the grid
-    # data_grid = ttk.Treeview(root)
-    # data_grid.grid(row=3, columnspan=3)
-    lb = Label(root, text="User selected: ", font=("Segoe UI", 12))
-    lb.grid(row = 4, column=0,pady=20, padx=15)
-    lbd = Label(root, font=("Segoe UI", 11))
-    lbd.grid(row=4, column=1)
-    #lb.config(text=f"{n}, {p}, {d}")
-
-
+    ############### lưu ý ################
+    note_frame = tk.Frame(root, width=400, height=100)
+    note_frame.pack(anchor = 'sw', side='bottom')
+    note_title = Label(note_frame, text="*****Lưu ý*****", font=("Segoe UI", 14, 'bold'))
+    note_title.pack(anchor='nw', padx = 10)
+    note_content = Label(note_frame, text="-  Tên nhân sự và đơn vị phải nhập không dấu và dính liền nhau", font=("Segoe UI", 12, 'italic'))
+    note_content.pack(anchor='nw', padx=10)
+    # note_content1 = Label(note_frame, text="-  Để trống ô TÊN nếu muốn thống kê theo đơn vị và ngược lại", font=("Segoe UI", 12, 'italic'))
+    # note_content1.pack(anchor='nw', padx=10)
+    # note_content2 = Label(note_frame, text="-  Nhập định dạng ngày như ví dụ sau: 26_06_2024", font=("Segoe UI", 12, 'italic'))
+    # note_content2.pack(anchor='nw', padx=10)
     root.mainloop()
