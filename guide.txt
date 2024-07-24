@@ -1,0 +1,8 @@
+combo 1: 
+main.py statistic.py user.py funcam.py
+
+combo 2: 
+app.py statistic.py user.py funcam.py
+
+combo 3:
+app.py , statistic_oop, user_oop, funcam

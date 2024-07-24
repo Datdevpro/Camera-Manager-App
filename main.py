@@ -5,6 +5,7 @@ from funcam import turn_cam
 #from show_db import showdb
 from statistic import statistic
 from user import user_manage
+#from test import User
 
 
 # SET UP INITITAL ROOT
@@ -26,7 +27,7 @@ root.iconbitmap("building_ico.ico")
 
 # CREATE LEFT FRAME MENU
     # SET UP SOME PROPERTIES
-min_w = 80 # Minimum width of the frame
+min_w = 90 # Minimum width of the frame
 max_w = 290 # Maximum width of the frame
 cur_width = min_w # Increasing width of the frame
 expanded = False # Check if it is completely exanded
@@ -97,7 +98,9 @@ showdtb_btn = Button(
         activeforeground="green",
         cursor='hand2', 
         justify="center",
-        command=statistic)
+        command=statistic
+        )
+
 add_btn = Button(
         left_menu, 
         image = add, 
@@ -106,13 +109,19 @@ add_btn = Button(
         activeforeground="green",
         cursor='hand2', 
         justify="center",
-        command = user_manage)
+        command = user_manage
+        )
 menu_lb = Label(left_menu, image=menu)
 
 menu_lb.grid(row = 0, column = 0, pady=40)
 viewcam_btn.grid(row = 1, column = 0, pady=20)
 showdtb_btn.grid(row = 2, column = 0, pady=50)
 add_btn.grid(row = 3, column = 0, pady=20)
+
+# menu_lb.pack(pady=20,  anchor='center')
+# viewcam_btn.pack(pady=20,  anchor='center')
+# showdtb_btn.pack(pady=20,  anchor='center')
+# add_btn.pack(pady=20, anchor='center')
 
 ### SHOW OR HIDE THE MENU
 left_menu.bind('<Enter>',lambda e: expand())
@@ -138,33 +147,6 @@ dut_label.place(relx=0.362, rely=0.25)
 text_label = Label(main_frame, text="Trường Đại học Bách khoa - Đại học Đà Nẵng\nQuản lý hệ thống Welcome S-Building", font=("Segoe UI", 17), fg=text_color, bg=bg_color)
 #text_label.pack(side="bottom",anchor="center")
 text_label.place(relx=0.225, rely=0.62)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
