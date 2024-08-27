@@ -1,0 +1,2 @@
+ - ở hàm list_late, em cần get thêm 1 trường đơn vị và chức vụ của người đó
+ - chỉnh lại format thời gian khi user nhập vào ( hiện tại là tháng - ngày - năm) thành ngày-tháng-năm

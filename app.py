@@ -5,8 +5,10 @@ from funcam import turn_cam
 #from show_db import showdb
 # from statistic import statistic
 # from user import user_manage
-from statistic_oop import Statistic
+from statistic_canhan import Statistic_cn
+from statistic_donvi import Statistic_dv
 from user_oop import User
+from static_option import option
 
 
 class App:
@@ -68,7 +70,7 @@ class App:
                 activeforeground="green",
                 cursor='hand2', 
                 justify="center",
-                command=self.statistic
+                command=option
             )
 
         self.add_btn = Button(
@@ -154,9 +156,9 @@ class App:
     def user(self):
         user = User()
         user.call_function_user()
-    def statistic(self):
-        stat = Statistic()
-        stat.call_function_statistic()
+    # def statistic(self):
+    #     stat = Statistic_cn()
+    #     stat.call_function_statistic()
 
 
 

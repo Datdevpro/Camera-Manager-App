@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import Label, Entry, Button
 from tkinter import ttk
+import requests
+import json
 
-class Statistic(tk.Tk):
+class Statistic_dv(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.geometry("1400x610")
+        self.geometry("1320x500")
         self.title("Thống kê nhân sự")
         self.font = ("Segoe UI", 11)
         #self.call()
@@ -39,33 +41,34 @@ class Statistic(tk.Tk):
 
     def left_frame_content(self):
 
-        ##### name ####
-        self.name = Label(self.main_frame, text="Tên nhân sự:",font=self.font)
-        self.name.grid(row=0, column=0 ,padx=5, pady=20)
-        self.name_entry = Entry(self.main_frame, font=("Segoe UI", 10), width=30, bd=3)
-        self.name_entry.grid(row=0, column=1,padx=5,pady=20)  
+        # ##### name ####
+        # self.name = Label(self.main_frame, text="Tên nhân sự:",font=self.font)
+        # self.name.grid(row=0, column=0 ,padx=5, pady=20)
+        # self.name_entry = Entry(self.main_frame, font=("Segoe UI", 10), width=30, bd=3)
+        # self.name_entry.grid(row=0, column=1,padx=5,pady=20)  
 
 
-        ############### CHỌN ĐƠN VỊ ########################
-        self.donvi = ["Option 1", "Option 2", "Option 3"]  # list đơn vị
+        #################### CHỌN ĐƠN VỊ ########################
+        
+        self.donvi = ['Phòng Tổ chức - Hành chính', "Khoa Môi Trường", "KT&ĐBCL", "TTPC", "Tổ CNTT", "Viện KHCN&BKĐN"]  # list đơn vị
         self.combolabel = Label(self.main_frame, text='Chọn đơn vị: ', font= self.font)
         self.combolabel.grid(row=1, column=0, padx=20)
         self.combobox = ttk.Combobox(self.main_frame, values= self.donvi, width=30)
         self.combobox['state'] = 'readonly'
         self.combobox.current()  # Giá trị mặc định
-        self.combobox.grid(row=1, column=1, pady=20)
+        self.combobox.grid(row=1, column=1, pady=20, padx=20)
         # Thêm sự kiện khi chọn một giá trị
         self.combobox.bind("<<ComboboxSelected>>",  self.on_select)
 
 
         ########### LOẠI THỐNG KÊ ###################
-        self.types = ["Trễ giờ", "Đúng Giờ"]
+        self.types = ["Trễ giờ"]
         self.thongke_label = Label(self.main_frame, text="Chọn loại thống kê: ", font=self.font)
         self.thongke_label.grid(row=2, column=0, pady=10)
         self.thongke_cbb = ttk.Combobox(self.main_frame, values=self.types, width=30)
         self.thongke_cbb['state'] = 'readonly'
         self.thongke_cbb.current()
-        self.thongke_cbb.grid(row=2, column=1, pady=10)
+        self.thongke_cbb.grid(row=2, column=1, pady=10, padx=20)
         self.thongke_cbb.bind("<<ComboboxSelected>>", self.late_on)
         ########################################
 
@@ -74,34 +77,34 @@ class Statistic(tk.Tk):
         self.startdate = Label(self.main_frame, text="Từ ngày: ", font= self.font)
         self.startdate.grid(row=3, column=0, padx=20, pady=15)
         self.sd_entry = Entry(self.main_frame, font=self.font, width=25, bd=3)
-        self.sd_entry.grid(row=3, column=1, pady=15)
+        self.sd_entry.grid(row=3, column=1, pady=15, padx=20)
         self.enddate = Label(self.main_frame, text="Đến ngày: ", font=self.font)
-        self.enddate.grid(row=4, column=0, pady=20)
+        self.enddate.grid(row=4, column=0, pady=20, padx=20)
         self.ed_entry = Entry(self.main_frame, font=self.font, width=25, bd=3)
-        self.ed_entry.grid(row=4, column=1, pady=20)
+        self.ed_entry.grid(row=4, column=1, pady=20, padx=20)
         ##########################################
 
 
         ############# BUTTON #############
         self.btn_canhan = Button(self.main_frame,
-                            text="Thống kê theo cá nhân", 
+                            text="Thống kê", 
                             padx=10, 
                             overrelief="raised", 
                             cursor="hand2", 
                             bd = 3,
                             state='active',
-                            command=self.add_newdata
+                            command=self.tk_donvi
 
                             )
-        self.btn_canhan.grid(row=5, column=0, pady=30, padx=10)
+        self.btn_canhan.grid(row=5, column=0, pady=30, padx=30, columnspan=2)
 
-        self.btn_donvi = Button(self.main_frame, 
-                            text="Thống kê theo đơn vị", 
-                            padx=10, 
-                            overrelief="raised", 
-                            cursor="hand2", 
-                            bd=3)
-        self.btn_donvi.grid(row=5, column=1, pady=30)
+        # self.btn_donvi = Button(self.main_frame, 
+        #                     text="Thống kê theo đơn vị", 
+        #                     padx=10, 
+        #                     overrelief="raised", 
+        #                     cursor="hand2", 
+        #                     bd=3)
+        # self.btn_donvi.grid(row=5, column=1, pady=30)
 
         ####################################################
 
@@ -121,24 +124,33 @@ class Statistic(tk.Tk):
     
     def right_frame_content(self):
         
-        self.tree = ttk.Treeview(self.right_frame, columns=("Name", "Time"), show="headings" )
-        self.tree.heading("Name", text="Họ Tên")
+        self.treescrolly = tk.Scrollbar(self.right_frame, orient="vertical") # command means update the yaxis view of the widget
+        self.treescrollx = tk.Scrollbar(self.right_frame, orient="horizontal") # command means update the xaxis view of the widget
+
+        self.treescrolly.pack(side='right', fill='y')
+        #self.treescrollx.pack(side='bottom', fill=x)
+
+        self.tree = ttk.Treeview(self.right_frame, columns=("Name", "Donvi", "Time"), show="headings", yscrollcommand=self.treescrolly.set)
+        self.tree.heading("Name", text="Họ tên")
         self.tree.heading("Time", text="Thời gian")
-        self.tree.column("Name", width=450, anchor='center')
-        self.tree.column("Time", width=450, anchor='center')
+        self.tree.heading("Donvi", text="Đơn vị")
+        self.tree.column("Name", width=300, anchor='center')
+        self.tree.column("Donvi", width=300, anchor='center')
+        self.tree.column("Time", width=300, anchor='center')
 
 
-        self.tree.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.tree.pack(side='left', fill=tk.BOTH, expand=True)
 
-        self.treescrolly = tk.Scrollbar(self.right_frame, orient="vertical", command=self.tree.yview) # command means update the yaxis view of the widget
-        self.treescrollx = tk.Scrollbar(self.right_frame, orient="horizontal", command=self.tree.xview) # command means update the xaxis view of the widget
+        self.treescrolly.config(command=self.tree.yview)
 
     def on_select(self, event):
-        print(f"You selected: {self.combobox.get()}")
+        #print(f"You selected: {self.combobox.get()}")
+        pass
 
     def late_on(self, event):
-        print(f"You selected: {self.thongke_cbb.get()}")
-        print(self.types.index(self.thongke_cbb.get()))
+        # print(f"You selected: {self.thongke_cbb.get()}")
+        # print(self.types.index(self.thongke_cbb.get()))
+        pass
 
     def cleartv(self):
         # self.tree.delete(*self.tree.get_children())
@@ -146,19 +158,37 @@ class Statistic(tk.Tk):
         for item in self.tree.get_children():
             self.tree.delete(item)
     
-    def add_newdata(self):
-        self.cleartv()
-        new_data = [("Tom", "1:00 PM"), ("Jerry", "2:00 PM"), ("Spike", "3:00 PM")]
-        for name, time in new_data:
-            self.tree.insert("", tk.END, values=(name, time))
+    
 
-    def call_function_statistic(self):
+    
+    def tk_donvi(self):
+    # if len(self.name_entry.get() != 0):
+        self.cleartv()
+        response = requests.get(
+            url='http://localhost:1234/list_late/', # url de gui get request
+            params={ # dict chua cac parameters cua request
+                'query_type':'tendonvi',
+                'query_val': [self.combobox.get()], # lay so lan di tre cua id 2 va 13
+                'start_date': self.sd_entry.get(), # ngay bat dau kiem tra 
+                'end_date':  self.ed_entry.get() #'06_20_24' # ngay ket thuc kiem tra
+            }
+        )
+        response.encoding = response.apparent_encoding
+        list_di_tre = json.loads(response.json())
+        for person in list_di_tre:
+            #id_di_tre = person['id']
+            hoten_di_tre = person['hoten']
+            thoigian_di_tre= person['thoigian']
+            donvi = person['tendonvi']
+            self.tree.insert("", tk.END, values=(hoten_di_tre, donvi, thoigian_di_tre))
+
+    def call_function_statistic_dv(self):
         self.create_frames()
         self.left_frame_content()
         self.right_frame_content()
 
-if __name__ == "__main__":
-    # Pass the instance to the ButtonApp
-    statistic_app = Statistic()
-
-    statistic_app.mainloop()
+# if __name__ == "__main__":
+#     # Pass the instance to the ButtonApp
+#     statistic_app = Statistic_dv()
+#     statistic_app.call_function_statistic()
+#     statistic_app.mainloop()

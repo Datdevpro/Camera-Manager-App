@@ -19,6 +19,8 @@ class User(tk.Tk):
         self.title("Quản lý nhân sự")
         self.geometry("500x650")
         self.font = ("Segoe UI", 11)
+        self.del_name = ''
+        
         # Creating the main frames
         #self.call_function_user()
         self.path = "C:/Users/WelcomeCamera/Welcome-Camera/DUT-Welcome_and_Management_System/Camera_AI_Control/data/training_data"
@@ -28,22 +30,9 @@ class User(tk.Tk):
         self.left_frame = ttk.Frame(self, width=600, height=500)
         #self.left_frame.grid(row=0, column=0, sticky="nswe")
         self.left_frame.pack(side='top', anchor='nw', padx=10)
-        #self.left_frame.grid_propagate(False)
-        #self.left_frame.grid_propagate(False)
+  
         
-        # # Separator
-        # self.separator = ttk.Separator(self, orient='vertical')
-        # self.separator.grid(row=0, column=1, sticky="ns")
 
-        # # Right frame
-        # self.right_frame = tk.LabelFrame(self, width=1000, height=600, relief=tk.SUNKEN)
-        # self.right_frame.grid(row=0, column=2, sticky="nswe")
-        # self.right_frame.grid_propagate(False)
-
-        # # Configure grid weights
-        # self.grid_columnconfigure(0, weight=1)
-        # self.grid_columnconfigure(2, weight=30)
-        # self.grid_rowconfigure(0, weight=1)
         
         ##### NOTES FRAME #######
         self.note_frame = ttk.Frame(self, width=600, height=150)
@@ -59,7 +48,7 @@ class User(tk.Tk):
         ######## GIOI TINH ##########
         self.gender = ttk.Label(self.left_frame, text="Giới Tính:", font=self.font)
         self.gender.grid(row=1, column=0, padx=5, pady=10)
-        self.gender_option = ttk.Combobox(self.left_frame, values=["Nam", "Nữ"], width=35)
+        self.gender_option = ttk.Combobox(self.left_frame, values=["M (Nam)", "F (Nữ)"], width=35)
         self.gender_option['state'] = 'readonly'
         self.gender_option.current()
         self.gender_option.grid(row=1, column=1, pady=10)
@@ -116,14 +105,11 @@ class User(tk.Tk):
         #############   GHI CHÚ   ###################
         self.note_title = tk.Label(self.note_frame, text="*****Lưu ý*****", font=("Segoe UI", 14, 'bold'))
         self.note_title.pack(anchor='nw', padx = 10)
-        self.note_content = tk.Label(self.note_frame, text="-  Viết tên có dấu đầy đủ", font=("Segoe UI", 12, 'italic'))
+        self.note_content = tk.Label(self.note_frame, text="-  Điền có dấu đầy đủ tất cả trường", font=("Segoe UI", 12, 'italic'))
         self.note_content.pack(anchor='nw', padx=10)
-        # self.note_content1 = tk.Label(self.note_frame, text="-  Nhập tên viết liền không dấu không viết hoa", font=("Segoe UI", 12, 'italic'))
-        # self.note_content1.pack(anchor='nw', padx=10)
+        self.note_content1 = tk.Label(self.note_frame, text="-  Giới tính F nếu là nữ M nếu là nam", font=("Segoe UI", 12, 'italic'))
+        self.note_content1.pack(anchor='nw', padx=10)
         ##########################################
-
-        # self.label_file = ttk.Label(self.left_frame, text="No file selected")
-        # self.label_file.grid(row=4, column=0)
 
     def get_gender(self, event):
         return self.gender_option.get()
@@ -139,7 +125,7 @@ class User(tk.Tk):
             url='http://localhost:1234/add_new_personnel/',
             json={
                 'id':'',
-                'gioitinh':self.gender_option.get(),
+                'gioitinh':self.gender_option.get()[0:1],
                 'hoten':self.name_entry.get(),
                 'hochamhocvi':self.hochamhocvi_entry.get(),
                 'chucvu':self.chucvu_entry.get(),
@@ -151,7 +137,8 @@ class User(tk.Tk):
         mess = add_response.content
         dict_str = mess.decode("UTF-8")
         mess_dixt = ast.literal_eval(dict_str)
-        print(mess_dixt['new_id'])
+        self.del_name = mess_dixt['new_id'] 
+        print(mess_dixt['new_id'], type(mess_dixt['new_id']))
 
         # name_folder = f"{self.name_entry.get()}_{self.position_entry.get()}"
         name_folder = f"{mess_dixt['new_id']}"
@@ -159,7 +146,7 @@ class User(tk.Tk):
         fullpath = os.path.join(self.path, name_folder)
         try:
             os.makedirs(fullpath)
-            messagebox.showinfo("Thông báo" ,f"Tạo thư mục thành công !\nđường dẫn: {fullpath}")
+            messagebox.showinfo("Thông báo" ,f"Tạo thư mục thành công !\nĐường dẫn: \n{fullpath} \n Folder có id là: {mess_dixt['new_id']}")
         except FileExistsError:
             messagebox.showinfo('Thông báo' ,"Thư mục đã tồn tại !")
         except Exception as e:
@@ -167,7 +154,17 @@ class User(tk.Tk):
         #print(f'{self.name_entry.get()} - {self.gender_option.get()} - {self.hochamhocvi_entry.get()} - {self.chucvu_entry.get()} - {self.position_entry.get()} - {self.nhanvien_option.get()}')
         
     def delete(self):
-        name_folder = f"{self.name_entry.get()}_{self.position_entry.get()}"
+        response = requests.delete(
+            url='http://localhost:1234/del_personnel/',
+            params={
+                'search_key':'hoten',
+                'search_value':self.name_entry.get()
+                # OR
+                # 'search_key':'id',
+                # 'search_value':['1', '13', '12', '2']
+            }
+        )
+        name_folder = f"{self.del_name}"
         fullpath = os.path.join(self.path, name_folder)
         try:
             if os.path.exists(fullpath):
